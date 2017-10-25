@@ -1,7 +1,4 @@
 %%% Finds common reactions between 2 models %%%
-%%% ancora problemi per quanto riguarda reazioni che hanno stessi
-%%% metaboliti ma coefficienti diversi. Le calcola come uguali. Questo per
-%%% il problema dell'approssimazione di cui prima
 
 function [commonRxns] = findCommonRxns(model1,model2)
 
