@@ -178,9 +178,9 @@ transplantRxns = transplantRxns(strncmp('rxn',transplantRxns,3));
 %Create raw submodel based on the reactions to be exported
 Dmodel = extractSubNetwork(donModel,transplantRxns);
 
-%%% PREVENTIVE SUBMODEL SDERENATION %%%
+%%% PREVENTIVE SUBMODEL SIMPLIFICATION %%%
 
-% Sderenate the submodels prior to fusion, so that the final swapped model
+% Simplify the gene association rules in the submodels prior to fusion, so that the final swapped model
 % comes out all tidy and clean
 
 % REMOVE THE BAD GENES FROM THE RULES
@@ -203,12 +203,12 @@ for n=1:length(unwantedGenesD)
     Dmodel.grRules = strrep(Dmodel.grRules,unwantedGenesD(n),'False');
 end
 
-% Sderenate the submodels
+% Simplify the submodels
 
-Rmodel = sderenateModel(Rmodel);
-Dmodel = sderenateModel(Dmodel);
+Rmodel = simplifyModel(Rmodel);
+Dmodel = simplifyModel(Dmodel);
 
-%%% /PREVENTIVE SUBMODEL SDERENATION %%%
+%%% /PREVENTIVE SUBMODEL SIMPLIFICATION %%%
 
 %Add the .rxnEquations fields to the 2 submodels
 Dmodel_rxnEquations = printRxnFormula(Dmodel);
@@ -224,7 +224,7 @@ Rmodel = setfield(Rmodel,'rxnEquations',Rmodel_rxnEquations);
 %%% association conflicts.
 %%% In case of duplicate reactions, the gprs will be those of the receiving,
 %%% connected with an ' or ' statement to those of the donor, the latter
-%%% having been sderenated of any ortholog. It is likely that the final
+%%% having been cleared of any ortholog. It is likely that the final
 %%% GPRs will only consist of the receiving ones.
 
 doubleRxns = findCommonRxns(Rmodel,Dmodel);
@@ -268,7 +268,7 @@ for n = 1:length(doubleRxns(:,1))
         % brackets
         tmpGPR = regexprep(tmpGPR,'(.*)','\($1\)');
         tmpGPR = sprintf('''%s''',tmpGPR);
-        [~,tmpGPR] = system(sprintf('python booleanSderenator.py %s',tmpGPR));
+        [~,tmpGPR] = system(sprintf('python booleanSimplifier.py %s',tmpGPR));
         % /brackets
         tmpGPR = regexprep(tmpGPR,'\((.*)\)','$1');
         rightGrRules(rxnID1)=strcat({'('},rightGrRules(rxnID1),{' or '},tmpGPR,{')'});
@@ -277,7 +277,7 @@ end
 
 [fused_model] = createModel(rightRxns,rightRxnNames,rightRxnEquations,rightRev,rightLB,rightUB,rightSubSystem,rightGrRules,'','');
 
-%%RIPULIRE MODELLO: 
+%%CLEAN UP THE MODEL: 
 %unwantedGenes = setdiff(intersect(fused_model.genes,cat(1,recRemoveGenes,setdiff(donorModel.genes,addRepliconGenes))),'UnknownX');
 %if ortFlag
 %    badGenes = intersect(fused_model.genes,badGenes);
