@@ -102,7 +102,7 @@ end
 
 
 %% First, find out which of the sureRxns are not already in the draft model.
-% For them, the GPRs shall be those of the topNotch, after sderenating the
+% For them, the GPRs shall be those of the topNotch, after removing the
 % non-ortholog genes
 sureNewRxns = setdiff(sureRxns,draftModel.rxns);
 sureNewList = cell(length(sureNewRxns),8);
@@ -124,12 +124,12 @@ end
 
 % The more brackets the better
 sureNewList(:,8) = regexprep(sureNewList(:,8),'(.*)','\($1\)');
-%%% SDERENATE %%%
+%%% SIMPLIFY %%%
 
 for n = 1:length(sureNewList(:,8))
     if ~isempty(sureNewList{n,8})
         tmpGPR = sprintf('''%s''',sureNewList{n,8});
-        [~,tmpGPR] = system(sprintf('python booleanSderenator.py %s',tmpGPR));
+        [~,tmpGPR] = system(sprintf('python booleanSimplifier.py %s',tmpGPR));
         sureNewList(n,8) = cellstr(tmpGPR);
     end
 end
@@ -145,9 +145,9 @@ end
 
 %% Secondly, find out which of the sureRxns are already present in the draft
 % model. Their fate is rather more complex. The final GPRs will be those of
-% the topNotch, sderenated of any gene that has no ortholog, concatenated
+% the topNotch, after removing any gene that has no ortholog, concatenated
 % with an 'or' statement with the GPRs of the draft, the latter having been
-% sderenated of any ortholog genes
+% cleared of any ortholog genes
 sureOldRxns = intersect(sureRxns,draftModel.rxns);
 sureOldList = cell(length(sureOldRxns),9);
 sureOldList(:,1) = sureOldRxns;
@@ -174,18 +174,18 @@ end
 sureOldList(:,8) = regexprep(sureOldList(:,8),'(.*)','\($1\)');
 sureOldList(:,9) = regexprep(sureOldList(:,9),'(.*)','\($1\)');
 
-%%% SDERENATE %%%
+%%% SIMPLIFY %%%
 for n = 1:length(sureOldList(:,8))
     if ~isempty(sureOldList{n,8})
         tmpGPR = sprintf('''%s''',sureOldList{n,8});
-        [~,tmpGPR] = system(sprintf('python booleanSderenator.py %s',tmpGPR));
+        [~,tmpGPR] = system(sprintf('python booleanSimplifier.py %s',tmpGPR));
         sureOldList(n,8) = cellstr(tmpGPR);
     end
 end
 for n = 1:length(sureOldList(:,9))
     if ~isempty(sureOldList{n,9})
         tmpGPR = sprintf('''%s''',sureOldList{n,9});
-        [~,tmpGPR] = system(sprintf('python booleanSderenator.py %s',tmpGPR));
+        [~,tmpGPR] = system(sprintf('python booleanSimplifier.py %s',tmpGPR));
         sureOldList(n,9) = cellstr(tmpGPR);
     end
 end
@@ -203,8 +203,8 @@ end
 sureOldList(:,9) = [];
 
 %%% It may happen that, in the draft model, the only gene bringing the
-%%% reaction about is an ortholog, and the first sderenation results in a
-%%% 'False' statement. So a second sderenation is necessary.
+%%% reaction about is an ortholog, and the first GPR simplification results in a
+%%% 'False' statement. So a second simplification is necessary.
 
 % First, make sure there aren't any ' or 's floating around
 sureOldList(:,8) = regexprep(sureOldList(:,8),'((?<=\() or | or (?=\)))','');
@@ -212,11 +212,11 @@ sureOldList(:,8) = regexprep(sureOldList(:,8),'((?<=\() or | or (?=\)))','');
 % The more brackets the better
 sureOldList(:,8) = regexprep(sureOldList(:,8),'(.*)','\($1\)');
 
-%%% SDERENATE %%%
+%%% SIMPLIFY %%%
 for n = 1:length(sureOldList(:,8))
     if ~isempty(sureOldList{n,8})
         tmpGPR = sprintf('''%s''',sureOldList{n,8});
-        [~,tmpGPR] = system(sprintf('python booleanSderenator.py %s',tmpGPR));
+        [~,tmpGPR] = system(sprintf('python booleanSimplifier.py %s',tmpGPR));
         sureOldList(n,8) = cellstr(tmpGPR);
     end
 end
@@ -236,7 +236,7 @@ end
 % Among these reactions, however, we should keep those which keep
 % functioning thanks to some other gene when the ortholog is taken out of
 % the relevant GPR. The latter (if there are any) should be kept after being contextually
-% sderenated
+% simplified
 [~,~,constrRxnNames] = deleteModelGenes(draftModel,setdiff(draftModel.genes,dictionary(:,2)));
 ortOnlyRxns = setdiff(draftModel.rxns,constrRxnNames);
 excludeRxns = setdiff(ortOnlyRxns,topNotchModel.rxns);
@@ -269,12 +269,12 @@ end
 
 % The more brackets the better (SAREBBE MEGLIO METTERLO DOPO IF, SIA QUA CHE ALTROVE)
 notExcludeList(:,8) = regexprep(notExcludeList(:,8),'(.*)','\($1\)');
-%%% SDERENATE %%%
+%%% SIMPLIFY %%%
 
 for n = 1:length(notExcludeList(:,8))
     if ~isempty(notExcludeList{n,8})
         tmpGPR = sprintf('''%s''',notExcludeList{n,8});
-        [~,tmpGPR] = system(sprintf('python booleanSderenator.py %s',tmpGPR));
+        [~,tmpGPR] = system(sprintf('python booleanSimplifier.py %s',tmpGPR));
         notExcludeList(n,8) = cellstr(tmpGPR);
     end
 end
