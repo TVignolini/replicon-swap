@@ -1,6 +1,6 @@
-% Applies BooleanSderenator.py
+% Applies BooleanSimplifier.py
 
-function sderenatedModel = sderenateModel(model)
+function simplifyModel = simplifyModel(model)
 
 % The more brackets the better
 model.grRules = regexprep(model.grRules,'(.*)','\($1\)');
@@ -8,7 +8,7 @@ model.grRules = regexprep(model.grRules,'(.*)','\($1\)');
 for n = 1:length(model.grRules)
     if ~isempty(model.grRules{n})
         newRule = sprintf('''%s''',model.grRules{n});
-        [~,newRule] = system(sprintf('python booleanSderenator.py %s',newRule));
+        [~,newRule] = system(sprintf('python booleanSimplifier.py %s',newRule));
         model.grRules(n) = cellstr(newRule);
     end
 end
@@ -16,6 +16,6 @@ end
 % Too many brackets
 model.grRules = regexprep(model.grRules,'\((.*)\)','$1');
 
-sderenatedModel = model;
+simplifiedModel = model;
 
 end
